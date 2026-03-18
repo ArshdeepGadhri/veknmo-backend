@@ -4,7 +4,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
-const { v4: uuidv4 } = require('uuid');
+const generateCode = () => Array.from({ length: 7 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -73,6 +73,28 @@ setInterval(() => {
     }
 }, 60000);
 
+// API: Get owner profile info (avatars fetched live via bot)
+const OWNER_IDS = {
+    art:  '170718155772002304',
+    vekn: '639557422637252648',
+};
+
+app.get('/api/owners', async (req, res) => {
+    try {
+        const [art, vekn] = await Promise.all([
+            client.users.fetch(OWNER_IDS.art,  { force: true }),
+            client.users.fetch(OWNER_IDS.vekn, { force: true }),
+        ]);
+        res.json({
+            art:  { username: art.username,  avatar: art.displayAvatarURL({ size: 128, extension: 'webp' }) },
+            vekn: { username: vekn.username, avatar: vekn.displayAvatarURL({ size: 128, extension: 'webp' }) },
+        });
+    } catch (e) {
+        console.error('[API] Failed to fetch owner profiles:', e);
+        res.status(500).json({ error: 'Could not fetch owner profiles' });
+    }
+});
+
 
 // ============================================
 // 2. DISCORD BOT LOGIC
@@ -89,7 +111,7 @@ const commands = [
 
 const botRateLimits = new Map();
 
-client.once('ready', async () => {
+client.once('clientReady', async () => {
     console.log(`[BOT] Logged in as ${client.user.tag}!`);
 
     if (GUILD_ID && BOT_TOKEN && GUILD_ID !== 'your_discord_server_id' && BOT_TOKEN !== 'your_discord_bot_token') {
@@ -132,7 +154,7 @@ client.on('interactionCreate', async interaction => {
         validRequests.push(now);
         botRateLimits.set(userId, validRequests);
 
-        const tokenString = uuidv4();
+        const tokenString = generateCode();
         const username = interaction.user.username;
         const avatar = interaction.user.avatar || '';
 
