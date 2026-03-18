@@ -87,18 +87,18 @@ setInterval(() => {
 
 // API: Get owner profile info (avatars fetched live via bot)
 const OWNER_IDS = {
-    art:  '170718155772002304',
+    art: '170718155772002304',
     vekn: '639557422637252648',
 };
 
 app.get('/api/owners', async (req, res) => {
     try {
         const [art, vekn] = await Promise.all([
-            client.users.fetch(OWNER_IDS.art,  { force: true }),
+            client.users.fetch(OWNER_IDS.art, { force: true }),
             client.users.fetch(OWNER_IDS.vekn, { force: true }),
         ]);
         res.json({
-            art:  { username: art.username,  avatar: art.displayAvatarURL({ size: 128, extension: 'webp' }) },
+            art: { username: art.username, avatar: art.displayAvatarURL({ size: 128, extension: 'webp' }) },
             vekn: { username: vekn.username, avatar: vekn.displayAvatarURL({ size: 128, extension: 'webp' }) },
         });
     } catch (e) {
@@ -176,7 +176,7 @@ client.on('interactionCreate', async interaction => {
 
         // Try to DM the user first
         try {
-            await interaction.user.send(`👻 **Spirit Box Response:**\nYour access code is: \`${tokenString}\`\nValid for 7 days.`);
+            await interaction.user.send(`👻 **Spirit Box Response:**\nYour access code is: \`${tokenString}\`\nGives you access to veknmo.xyz for 7 days and is one time use only.`);
             await interaction.reply({ content: 'Check your DMs for your access code', ephemeral: true });
         } catch (error) {
             // If DMs are closed
