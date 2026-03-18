@@ -16,8 +16,20 @@ const GUILD_ID = process.env.GUILD_ID;
 // 1. EXPRESS SERVER & TOKEN STORE
 // ============================================
 
-app.use(cors());
+const ALLOWED_ORIGINS = [
+    'https://veknmo.xyz',
+    'http://localhost:5173',
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // allow server-to-server / curl (no origin header) and listed origins
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+        callback(new Error('Not allowed by CORS'));
+    }
+}));
 app.use(express.json());
+
 
 // In-memory token store: token -> { userId, username, avatar, expiry }
 const tokenStore = new Map();
