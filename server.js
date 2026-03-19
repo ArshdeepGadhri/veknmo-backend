@@ -190,9 +190,32 @@ client.on('interactionCreate', async interaction => {
 // 3. START SERVICES
 // ============================================
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`[SERVER] Express API running on port ${PORT}`);
 });
+
+const { Server } = require("socket.io");
+const io = new Server(server, {
+    cors: {
+        origin: (origin, callback) => {
+            if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+});
+
+let activeInvestigators = 0;
+
+io.on('connection', (socket) => {
+    activeInvestigators++;
+    io.emit('viewerCount', activeInvestigators);
+
+    socket.on('disconnect', () => {
+        activeInvestigators--;
+        io.emit('viewerCount', activeInvestigators);
+    });
+});
+
 
 if (BOT_TOKEN && BOT_TOKEN !== 'your_discord_bot_token') {
     client.login(BOT_TOKEN).catch(err => console.error('[BOT] Login failed:', err));
