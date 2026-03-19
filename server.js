@@ -205,14 +205,16 @@ const io = new Server(server, {
 });
 
 let activeInvestigators = 0;
+// Generate a fake baseline of 2-5 users so the board never looks entirely empty
+const FAKE_BASE = Math.floor(Math.random() * 4) + 2;
 
 io.on('connection', (socket) => {
     activeInvestigators++;
-    io.emit('viewerCount', activeInvestigators);
+    io.emit('viewerCount', activeInvestigators + FAKE_BASE);
 
     socket.on('disconnect', () => {
         activeInvestigators--;
-        io.emit('viewerCount', activeInvestigators);
+        io.emit('viewerCount', activeInvestigators + FAKE_BASE);
     });
 });
 
