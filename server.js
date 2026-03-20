@@ -205,8 +205,8 @@ const io = new Server(server, {
 });
 
 let activeInvestigators = 0;
-// Generate a fake baseline of 2-5 users so the board never looks entirely empty
-const FAKE_BASE = Math.floor(Math.random() * 4) + 2;
+// Generate a fake baseline of 2-3 users so the board never looks entirely empty
+const FAKE_BASE = Math.floor(Math.random() * 1) + 2;
 
 io.on('connection', (socket) => {
     activeInvestigators++;
