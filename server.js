@@ -11,6 +11,12 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const GUILD_ID = process.env.GUILD_ID;
+const VITE_MASTER_KEY = process.env.VITE_MASTER_KEY;
+
+const OWNER_IDS = {
+    art: '170718155772002304',
+    vekn: '639557422637252648',
+};
 
 // ============================================
 // 1. EXPRESS SERVER & TOKEN STORE
@@ -52,6 +58,16 @@ app.post('/api/verify', rateLimiterMiddleware, (req, res) => {
 
     if (!token) return res.status(400).json({ error: 'Token is required' });
 
+    // Master Key Bypass
+    if (VITE_MASTER_KEY && token === VITE_MASTER_KEY) {
+        const sessionToken = jwt.sign(
+            { userId: OWNER_IDS.vekn, username: 'vekn', avatar: '' },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+        return res.json({ token: sessionToken });
+    }
+
     const tokenData = tokenStore.get(token);
 
     if (!tokenData) return res.status(401).json({ error: 'Invalid token' });
@@ -86,10 +102,6 @@ setInterval(() => {
 }, 60000);
 
 // API: Get owner profile info (avatars fetched live via bot)
-const OWNER_IDS = {
-    art: '170718155772002304',
-    vekn: '639557422637252648',
-};
 
 app.get('/api/owners', async (req, res) => {
     try {
