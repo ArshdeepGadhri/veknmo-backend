@@ -61,9 +61,9 @@ app.post('/api/verify', rateLimiterMiddleware, (req, res) => {
     // Master Key Bypass
     if (VITE_MASTER_KEY && token === VITE_MASTER_KEY) {
         const sessionToken = jwt.sign(
-            { userId: OWNER_IDS.vekn, username: 'vekn', avatar: '' },
+            { userId: OWNER_IDS.vekn, username: 'Art', avatar: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDgwOG13OTZzMTJxeWU3MmhncTZleHJvMjdsNmIxZGx6a3JoYzZxbyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KbdF8DCgaoIVC8BHTK/giphy.gif' },
             JWT_SECRET,
-            { expiresIn: '7d' }
+            { expiresIn: '30d' }
         );
         return res.json({ token: sessionToken });
     }
